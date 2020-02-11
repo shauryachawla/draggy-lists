@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Index from '@/components/Index'
-import EditList from '@/components/EditList'
+import Lists from '@/components/Lists'
 Vue.use(Router)
 
 export default new Router({
@@ -12,9 +12,9 @@ export default new Router({
       component: Index
     },
     {
-      path: '/edit-board/:list_id',
-      name: 'EditList',
-      component: EditList,
+      path: '/b/:board_id',
+      name: 'Lists',
+      component: Lists,
     }
   ]
 })
