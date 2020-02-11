@@ -1,6 +1,7 @@
 <template>
   <div class="broot">
     <div class="container">
+      
       <div class="columns is-multiline">
         <div class="column is-4">
           <button
@@ -13,12 +14,13 @@
             <strong>Add new board</strong>
             <div class="field is-grouped">
               <p class="control is-expanded">
-                <input class="input" type="text" v-model="newBoardName" placeholder="Board name" />
+                <input class="input" v-on:keyup.enter="addBoard" type="text" v-model="newBoardName" placeholder="Board name" />
               </p>
               <p class="control">
                 <button @click="addBoard" class="button is-info">Add</button>
               </p>
             </div>
+            <p v-if="feedback" class="help is-danger">{{feedback}}</p>
           </div>
         </div>
         <div class="column is-4" v-for="board in boards" :key="board.id">
@@ -35,22 +37,24 @@
 
 <script>
 import Section from "@/components/Section";
-// import Boards from "@/components/Boards";
-// import ListList from "@/components/ListList";
+import db from "@/firebase/init";
+
 export default {
   name: "Index",
   components: {},
   methods: {
     addBoard() {
       // this.newBoardToggleVisible = true;
-      if(!this.newBoardName){
-        this.feedback = "Please enter a name."
+      if (!this.newBoardName) {
+        this.feedback = "Please enter a name.";
       } else {
-        this.feedback = null
-        this.newBoardToggleVisible = false
-        let newBoard = {name: this.newBoardName, id: (this.boards.length+1)}
+        this.feedback = null;
+        // this.newBoardToggleVisible = false;
+        let newBoard = { name: this.newBoardName, id: this.boards.length + 1 , lists: []};
+        db.collection('boards').add(newBoard)
         this.boards.push(newBoard)
-        console.log(this.boards)
+        this.newBoardName = null
+        // console.log(this.boards);
       }
     }
   },
@@ -60,13 +64,18 @@ export default {
       newBoardName: null,
       feedback: null,
       boards: [
-        { name: "One", id: 1 },
-        { name: "Two", id: 2 },
-        { name: "Three", id: 3 },
-        { name: "Four", id: 4 },
-        { name: "Five", id: 5 }
       ]
     };
+  },
+  created() {
+    db.collection('boards').get().then(snapshot => {
+      snapshot.forEach(doc => {
+        let board = doc.data()
+        board.id = doc.id
+        this.boards.push(board)
+      })
+    })
+    console.log(this.boards)
   }
 };
 </script>
