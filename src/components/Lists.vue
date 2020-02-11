@@ -38,7 +38,7 @@ export default {
       console.log(e)
     },
     addList() {
-      let newList = {name: newListName}
+      let newList = {name: this.newListName}
       db.collection('boards').doc(this.$route.params.board_id).add(newList)
     }
   },
