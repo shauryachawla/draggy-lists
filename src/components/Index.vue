@@ -4,7 +4,7 @@
       <div class="columns is-multiline">
         <div class="column is-4">
           <button
-            @click="addBoard()"
+            @click="newBoardToggleVisible=!newBoardToggleVisible"
             v-if="!newBoardToggleVisible"
             class="button is-light is-fullwidth is-warning is-rounded is-outlined is-medium"
           >add new board</button>
@@ -13,10 +13,10 @@
             <strong>Add new board</strong>
             <div class="field is-grouped">
               <p class="control is-expanded">
-                <input class="input" type="text" placeholder="Board name" />
+                <input class="input" type="text" v-model="newBoardName" placeholder="Board name" />
               </p>
               <p class="control">
-                <button @click class="button is-info">Add</button>
+                <button @click="addBoard" class="button is-info">Add</button>
               </p>
             </div>
           </div>
@@ -42,12 +42,23 @@ export default {
   components: {},
   methods: {
     addBoard() {
-      this.newBoardToggleVisible = true;
+      // this.newBoardToggleVisible = true;
+      if(!this.newBoardName){
+        this.feedback = "Please enter a name."
+      } else {
+        this.feedback = null
+        this.newBoardToggleVisible = false
+        let newBoard = {name: this.newBoardName, id: (this.boards.length+1)}
+        this.boards.push(newBoard)
+        console.log(this.boards)
+      }
     }
   },
   data() {
     return {
       newBoardToggleVisible: false,
+      newBoardName: null,
+      feedback: null,
       boards: [
         { name: "One", id: 1 },
         { name: "Two", id: 2 },
