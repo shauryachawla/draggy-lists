@@ -38,6 +38,8 @@
 <script>
 import Section from "@/components/Section";
 import db from "@/firebase/init";
+import firebase from 'firebase'
+import firestore from 'firebase/firestore'
 
 export default {
   name: "Index",
@@ -49,12 +51,10 @@ export default {
         this.feedback = "Please enter a name.";
       } else {
         this.feedback = null;
-        // this.newBoardToggleVisible = false;
-        let newBoard = { name: this.newBoardName, id: this.boards.length + 1 , lists: []};
-        db.collection('boards').add(newBoard)
-        this.boards.push(newBoard)
-        this.newBoardName = null
-        // console.log(this.boards);
+        
+        db.collection('boards').add({'name': this.newBoardName})
+
+
       }
     }
   },
@@ -68,14 +68,17 @@ export default {
     };
   },
   created() {
-    db.collection('boards').get().then(snapshot => {
-      snapshot.forEach(doc => {
-        let board = doc.data()
-        board.id = doc.id
-        this.boards.push(board)
+    db.collection('boards').onSnapshot(snapshot => {
+      snapshot.docChanges().forEach((change) => {
+        if(change.type == 'added') {
+          let board = change.doc.data()
+          board.id = change.doc.id
+          this.boards.push(board)
+          // console.log(this.boards)
+        }
       })
     })
-    console.log(this.boards)
+    
   }
 };
 </script>
