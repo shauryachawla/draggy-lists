@@ -39,16 +39,30 @@ export default {
     };
   },
   created() {
-    db.collection('boards').doc(this.id).collection('lists').get().then((qSnapshot) => {
-      console.log(qSnapshot.docChanges())
-      qSnapshot.docChanges().forEach((change) => {
-        if(change.type == 'added') {
-          let list = {name: change.doc.name, tasks: change.doc.tasks}
-          list.id = change.doc.id
-          this.lists.push(list)
-        }
+    // somethings wrong in here
+    // db.collection('boards').doc(this.id).collection('lists').get().then((qSnapshot) => {
+    //   console.log(qSnapshot.docChanges())
+    //   qSnapshot.docChanges().forEach((change) => {
+    //     if(change.type == 'added') {
+    //       let list = {name: change.doc.name, tasks: change.doc.tasks}
+    //       list.id = change.doc.id
+    //       this.lists.push(list)
+    //     }
+    //   })
+    // })
+
+
+    db.collection('boards').doc(this.id).collection('lists').get().then(snapshot => {
+      snapshot.forEach(doc => {
+        let list = doc.data()
+        list.id = doc.id
+        this.lists.push(list)
       })
     })
+
+
+
+
   },
   methods: {
     addTask(e) {
