@@ -1,20 +1,22 @@
 <template>
   <div id="app">
-    <Section />
-    <router-view/>
+    <Navbar />
+    <div class="container">
+      <router-view />
+    </div>
   </div>
 </template>
 
 <script>
-import Section from '@/components/Section'
+// import Section from '@/components/Section'
+import Navbar from "@/components/Navbar";
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    Section: Section
+    Navbar
   }
-}
+};
 </script>
 
 <style>
-
 </style>
