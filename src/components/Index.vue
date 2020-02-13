@@ -51,10 +51,7 @@ export default {
         this.feedback = "Please enter a name.";
       } else {
         this.feedback = null;
-        
         db.collection('boards').add({'name': this.newBoardName})
-
-
       }
     }
   },

@@ -1,12 +1,12 @@
 <template>
   <div class="container">
+    {{id}}
     <div class="columns is-multiline">
       <div v-for="list in lists" :key="list.id" class="column is-3">
         <div class="notification is-info is-light">
           {{list}}
           <input type="text" v-on:keyup.enter="addTask" class="input" />
           <ol type="1">
-            S
             <li v-for="taskx in list.content" :key="taskx.id">{{taskx.task}}</li>
           </ol>
         </div>
@@ -28,35 +28,45 @@
 
 <script>
 import db from "@/firebase/init";
+
+
 export default {
+  data() {
+    return {
+      newListName: null,
+      lists: [],
+      id: this.$route.params.board_id
+    };
+  },
   created() {
-    db.collection("boards")
-      .doc(this.$route.params.board_id)
-      .get()
-      .then(snapshot => {
-        console.log();
-      });
+    db.collection('boards').doc(this.id).collection('lists').get().then((qSnapshot) => {
+      console.log(qSnapshot.docChanges())
+      qSnapshot.docChanges().forEach((change) => {
+        if(change.type == 'added') {
+          let list = {name: change.doc.name, tasks: change.doc.tasks}
+          list.id = change.doc.id
+          this.lists.push(list)
+        }
+      })
+    })
   },
   methods: {
     addTask(e) {
       console.log(e);
     },
     addList() {
-      let newList = { name: this.newListName };
-      this.lists.push(newList);
-      db.collection("boards")
-        .doc(this.$route.params.board_id)
-        .add(newList);
-    }
-  },
-  data() {
-    return {
-      newListName: null,
-      lists: []
-    };
-  }
-};
-</script>
+      if(!this.newListName) {
+        this.feedback = "Please provide the name for the list"
+      } else {
+        this.feedback = null
+        let newList = {name: this.newListName, tasks:[]}
 
-<style>
-</style>
+        db.collection('boards').doc(this.id).collection('lists').add(newList)
+        this.lists.push(newList)
+      }
+    },
+  }
+
+}
+
+</script>
