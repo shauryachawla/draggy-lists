@@ -2,6 +2,7 @@
   <div class="section">
     <div class="columns is-multiline">
       <div class="column is-3">
+        <h3 class="is-size-3 has-text-centered">Add New List</h3>
         <div class="notification is-success is-light">
           <input
             type="text"
@@ -12,28 +13,28 @@
           />
         </div>
       </div>
-      <!-- <div v-for="list in lists" :key="list.id" class="column is-3">
-        <div class="notification is-info is-light">
-          {{list}}
-          <input type="text" v-on:keyup.enter="addTask($event, list.id)" class="input" />
-          <button
-            v-for="(task,x) in list.tasks"
-            :key="x"
-            @click.prevent
-            class="button is-success is-light"
-          >{{task}}</button>
-        </div>
-      </div>-->
       <div v-for="list in lists" :key="list.id" class="column is-3">
-        <h3>{{list.name}}</h3>
-        <input type="text" class="input" @keyup.enter="addTask(list.id)" />
+        <h3 class="is-size-3 has-text-centered">{{list.name}}</h3>
+        <input
+          type="text"
+          class="input has-background-white-ter has-text-centered"
+          placeholder="Add New Task"
+          @keyup.enter="addTask(list.id)"
+        />
         <draggable class="list-group" :list="list.tasks" group="people" @change="log">
           <button
             @click.prevent
-            class="button is-fullwidth list-group-item"
+            class="button is-light is-medium is-info is-outlined is-fullwidth list-group-item"
             v-for="(element) in list.tasks"
             :key="element.name"
-          >{{ element }}</button>
+          >
+            <span class>{{ element }}</span>
+            <a
+              @click="deleteTask(list.id, element)"
+              class="delete"
+              style="position: absolute; top: 0; right: 0;"
+            ></a>
+          </button>
         </draggable>
       </div>
     </div>
@@ -70,20 +71,38 @@ export default {
       });
   },
   methods: {
+    deleteTask(list_id, element) {
+      console.log(list_id, element);
+      // console.log(this.lists)
+      db.collection("boards")
+        .doc(this.id)
+        .collection("lists")
+        .doc(list_id)
+        .update({
+          tasks: firebase.firestore.FieldValue.arrayRemove(element)
+        });
+      this.lists.filter(list => {
+        if (list_id == list.id) {
+          console.log(list.tasks)
+          let i = list.tasks.indexOf(element)
+          list.tasks.splice(i, 1)
+        }
+      });
+    },
     addTask(list_id) {
       db.collection("boards")
-          .doc(this.id)
-          .collection("lists")
-          .doc(list_id)
-          .update({
-            tasks: firebase.firestore.FieldValue.arrayUnion(event.target.value)
-          });
-
-        this.lists.filter(list => {
-          if (list.id == list_id) {
-            list.tasks.push(event.target.value);
-          }
+        .doc(this.id)
+        .collection("lists")
+        .doc(list_id)
+        .update({
+          tasks: firebase.firestore.FieldValue.arrayUnion(event.target.value)
         });
+
+      this.lists.filter(list => {
+        if (list.id == list_id) {
+          list.tasks.push(event.target.value);
+        }
+      });
     },
     addList() {
       if (!this.newListName) {
@@ -105,8 +124,9 @@ export default {
     },
     log(evt) {
       window.console.log(evt);
-
+      // console.log(event.target)
       // FML it's working. The drag moving is working.
+      // But it's inefficient cos it just syncs every list from firebase.
       if (evt.added) {
         db.collection("boards")
           .doc(this.id)
