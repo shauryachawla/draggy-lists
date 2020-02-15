@@ -3,7 +3,7 @@
     <div class="columns is-multiline">
       <div class="column is-4">
         <button
-          @click="newBoardToggleVisible=!newBoardToggleVisible"
+          @click="newBoardToggleVisible=!newBoardToggleVisible;"
           v-if="!newBoardToggleVisible"
           class="button is-light is-fullwidth is-warning is-rounded is-outlined is-medium"
         >add new board</button>
@@ -29,9 +29,9 @@
       </div>
       <div class="column is-4" v-for="board in boards" :key="board.id">
         <router-link :to="{name: 'Lists', params: {board_id: board.id} }">
-          <button
-            class="button is-info is-outlined is-light is-medium is-fullwidth is-rounded"
-          >{{board.name}}</button>
+          <button class="button is-info is-outlined is-light is-medium is-fullwidth">
+            <span>{{board.name}}</span>
+          </button>
         </router-link>
       </div>
     </div>
@@ -41,8 +41,8 @@
 <script>
 // import Section from "@/components/Section";
 import db from "@/firebase/init";
-import firebase from "firebase";
-import firestore from "firebase/firestore";
+// import firebase from "firebase";
+// import firestore from "firebase/firestore";
 
 export default {
   name: "Index",
@@ -56,6 +56,7 @@ export default {
         this.feedback = null;
 
         db.collection("boards").add({ name: this.newBoardName });
+        this.newBoardName = null;
       }
     }
   },
